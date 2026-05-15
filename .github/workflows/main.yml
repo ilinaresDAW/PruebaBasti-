@@ -18,15 +18,19 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
+          port: 443
           source: "."
-          target: "/var/www/html"
+          target: "/tmp/deploy"
+          debug: true
 
-      - name: Reiniciar Apache (Opcional)
+      - name: Mover archivos a Apache
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          script: sudo systemctl restart apache2
+          port: 443
+          script: |
+            sudo mkdir -p /var/www/html
+            sudo cp -r /tmp/deploy/* /var/www/html/
+            sudo systemctl restart apache2
